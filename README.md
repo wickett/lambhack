@@ -7,7 +7,8 @@ This first release only contains arbitrary code execution through the query stri
 
 ## What can you do with lambhack?
 
-See RSA preso > http://www.slideshare.net/wickett/serverless-security-are-you-ready-for-the-future
+See Velocity preso > http://www.slideshare.net/wickett/serverless-security-are-you-ready-for-the-future
+
 
 ## License
 MIT License
