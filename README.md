@@ -9,6 +9,15 @@ This first release only contains arbitrary code execution through the query stri
 
 See Velocity preso > http://www.slideshare.net/wickett/serverless-security-are-you-ready-for-the-future
 
+## Setup
+
+```
+go get github.com/wickett/lambhack
+```
+
+In case you are new to golang, this clones the prohect to `$GOPATH/src/github.com/wickett/lambhack`
+
+Now you need to setup your AWS user and local credentials.  I recommend setting up creds in `.aws/credentials` and using a profile called sparta with limited perms. 
 
 ## License
 MIT License

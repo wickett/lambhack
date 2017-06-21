@@ -9,7 +9,7 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	sparta "github.com/mweagle/Sparta"
-	runner "github.com/wickett/serverless-audit/runner"
+	runner "github.com/wickett/lambhack/runner"
 )
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -21,20 +21,18 @@ func paramVal(keyName string, defaultValue string) string {
 	return value
 }
 
-var s3Bucket = paramVal("S3_TEST_BUCKET", "arn:aws:s3:::serverless-audit")
+var s3Bucket = paramVal("S3_TEST_BUCKET", "arn:aws:s3:::lambhack")
 
-func serverlessAuditEvent(event *json.RawMessage,
+func lambhackEvent(event *json.RawMessage,
 	context *sparta.LambdaContext,
 	w http.ResponseWriter,
 	logger *logrus.Logger) {
 
-	//code here for serverless audit
+	//code here for lambhack
 
 	var lambdaEvent sparta.APIGatewayLambdaJSONEvent
 	_ = json.Unmarshal([]byte(*event), &lambdaEvent)
-	//	text = lambdaEvent.PathParams.Passage
 
-	//command := lambdaEvent.PathParams["command"]
 	command := lambdaEvent.QueryParams["args"]
 	output := runner.Run(command)
 	logger.WithFields(logrus.Fields{
@@ -50,8 +48,8 @@ func serverlessAuditEvent(event *json.RawMessage,
 func appendS3Lambda(api *sparta.API, lambdaFunctions []*sparta.LambdaAWSInfo) []*sparta.LambdaAWSInfo {
 	options := new(sparta.LambdaFunctionOptions)
 	options.Timeout = 30
-	lambdaFn := sparta.NewLambda(sparta.IAMRoleDefinition{}, serverlessAuditEvent, options)
-	apiGatewayResource, _ := api.NewResource("/serverless-audit/{command+}", lambdaFn)
+	lambdaFn := sparta.NewLambda(sparta.IAMRoleDefinition{}, lambhackEvent, options)
+	apiGatewayResource, _ := api.NewResource("/lambhack/{command+}", lambdaFn)
 	apiGatewayResource.NewMethod("GET", http.StatusOK)
 
 	lambdaFn.Permissions = append(lambdaFn.Permissions, sparta.S3Permission{
@@ -75,16 +73,16 @@ func spartaLambdaData(api *sparta.API) []*sparta.LambdaAWSInfo {
 
 func main() {
 	stage := sparta.NewStage("prod")
-	apiGateway := sparta.NewAPIGateway("serverlessauditAPI", stage)
+	apiGateway := sparta.NewAPIGateway("lambhackAPI", stage)
 	apiGateway.CORSEnabled = true
 
 	//lambda info
 	os.Setenv("AWS_PROFILE", "sparta")
 	os.Setenv("AWS_REGION", "us-east-1")
 
-	stackName := "ServerlessAuditApplication"
+	stackName := "LambhackApplication"
 	sparta.Main(stackName,
-		"Serverless Audit Application",
+		"Lambhack Application",
 		spartaLambdaData(apiGateway),
 		apiGateway,
 		nil)

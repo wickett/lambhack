@@ -1,5 +1,5 @@
 provision:
-	go run main.go provision -s serverless-audit
+	go run main.go provision -s lambhack
 
 test:
 	@go test ./...
