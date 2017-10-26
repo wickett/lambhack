@@ -42,4 +42,10 @@ MIT License
 Send in PRs
 
 ## Known Problems
-I started out calling this thing serverless-audit but have renamed it lambhack. None of the code reflects this yet.
+* No UI!
+* No XSS attacks
+* No Injection attacks
+* No auth attacks
+* ....
+
+Would love some help! 
