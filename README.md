@@ -31,7 +31,7 @@ $ curl “https://XXXX.execute-api.us-east-1.amazonaws.com/prod/lambhack/args=ls
 go get github.com/wickett/lambhack
 ```
 
-In case you are new to golang, this clones the prohect to `$GOPATH/src/github.com/wickett/lambhack`
+In case you are new to golang, this clones the project to `$GOPATH/src/github.com/wickett/lambhack`
 
 Now you need to setup your AWS user and local credentials.  I recommend setting up creds in `.aws/credentials` and using a profile called sparta with limited perms. 
 
