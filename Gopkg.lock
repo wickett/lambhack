@@ -15,21 +15,12 @@
   revision = "e5086e5a7e53f7039034fa29008221760b04ff79"
   version = "v1.13.2"
 
-[[projects]]
-  branch = "master"
-  digest = "1:602832fd19dff0b4a2cc3be5f7b74c62c07fb6936d08eb73f103522b21011193"
-  name = "github.com/wickett/lambhack"
-  packages = ["runner"]
-  pruneopts = ""
-  revision = "7121b064cbbec2f56eceaedbd2d3d877962e093b"
-
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
     "github.com/aws/aws-lambda-go/events",
     "github.com/aws/aws-lambda-go/lambda",
-    "github.com/wickett/lambhack/runner",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1

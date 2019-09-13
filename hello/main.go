@@ -1,10 +1,7 @@
 package main
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
-
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	runner "github.com/karthequian/lambhack/runner"
@@ -19,28 +16,13 @@ type Response events.APIGatewayProxyResponse
 
 // Handler is our lambda handler invoked by the `lambda.Start` function call
 func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (Response, error) {
-	var buf bytes.Buffer
 
-	log.Print("Query: ", request.QueryStringParameters["q"])
-	log.Print("Headers: %v", request.Headers)
-	log.Print("context ", ctx)
-	headers := map[string]string{"Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept"}
-
-	log.Print(headers)
-	var output string
-
+	output := "Your function executed successfully!"
 	if len(request.QueryStringParameters["q"]) > 0 {
+		// Source of our hacky code...
 		output = runner.Run(request.QueryStringParameters["q"])
 		log.Print("Request %v, q=%v, %v", string(request.QueryStringParameters["q"]), string(output))
 		log.Print(output)
-	} else {
-		body, err := json.Marshal(map[string]interface{}{
-			"message": "Your function executed successfully!",
-		})
-		if err != nil {
-			return Response{StatusCode: 404}, err
-		}
-		json.HTMLEscape(&buf, body)
 	}
 
 	resp := Response{
