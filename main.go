@@ -1,90 +1,45 @@
 package main
 
 import (
+	"bytes"
+	"context"
 	"encoding/json"
-	"fmt"
-	"net/http"
-	"os"
-	"time"
 
-	"github.com/Sirupsen/logrus"
-	sparta "github.com/mweagle/Sparta"
+	"github.com/aws/aws-lambda-go/events"
 	runner "github.com/wickett/lambhack/runner"
 )
 
-////////////////////////////////////////////////////////////////////////////////
-func paramVal(keyName string, defaultValue string) string {
-	value := os.Getenv(keyName)
-	if "" == value {
-		value = defaultValue
-	}
-	return value
-}
-
-var s3Bucket = paramVal("S3_TEST_BUCKET", "arn:aws:s3:::lambhack")
-
-func lambhackEvent(event *json.RawMessage,
-	context *sparta.LambdaContext,
-	w http.ResponseWriter,
-	logger *logrus.Logger) {
-
-	//code here for lambhack
-
-	var lambdaEvent sparta.APIGatewayLambdaJSONEvent
-	_ = json.Unmarshal([]byte(*event), &lambdaEvent)
-
-	command := lambdaEvent.QueryParams["args"]
-	output := runner.Run(command)
-	logger.WithFields(logrus.Fields{
-		"Event":   string(*event),
-		"Command": string(command),
-		"Output":  string(output),
-	}).Info("Request received")
-
-	fmt.Fprintf(w, output)
-	time.Sleep(time.Second)
-}
-
-func appendS3Lambda(api *sparta.API, lambdaFunctions []*sparta.LambdaAWSInfo) []*sparta.LambdaAWSInfo {
-	options := new(sparta.LambdaFunctionOptions)
-	options.Timeout = 30
-	lambdaFn := sparta.NewLambda(sparta.IAMRoleDefinition{}, lambhackEvent, options)
-	apiGatewayResource, _ := api.NewResource("/lambhack/{command+}", lambdaFn)
-	apiGatewayResource.NewMethod("GET", http.StatusOK)
-
-	lambdaFn.Permissions = append(lambdaFn.Permissions, sparta.S3Permission{
-		BasePermission: sparta.BasePermission{
-			SourceArn: s3Bucket,
-		},
-		Events: []string{"s3:ObjectCreated:*", "s3:ObjectRemoved:*"},
-	})
-	return append(lambdaFunctions, lambdaFn)
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Return the *[]sparta.LambdaAWSInfo slice
+// Response is of type APIGatewayProxyResponse since we're leveraging the
+// AWS Lambda Proxy Request functionality (default behavior)
 //
-func spartaLambdaData(api *sparta.API) []*sparta.LambdaAWSInfo {
+// https://serverless.com/framework/docs/providers/aws/events/apigateway/#lambda-proxy-integration
+type Response events.APIGatewayProxyResponse
 
-	var lambdaFunctions []*sparta.LambdaAWSInfo
-	lambdaFunctions = appendS3Lambda(api, lambdaFunctions)
-	return lambdaFunctions
+// Handler is our lambda handler invoked by the `lambda.Start` function call
+func Handler(ctx context.Context) (Response, error) {
+	var buf bytes.Buffer
+
+	body, err := json.Marshal(map[string]interface{}{
+		"message": "Go Serverless v1.0! Your function executed successfully!",
+	})
+	if err != nil {
+		return Response{StatusCode: 404}, err
+	}
+	json.HTMLEscape(&buf, body)
+
+	resp := Response{
+		StatusCode:      200,
+		IsBase64Encoded: false,
+		Body:            buf.String(),
+		Headers: map[string]string{
+			"Content-Type":           "application/json",
+			"X-MyCompany-Func-Reply": "hello-handler",
+		},
+	}
+
+	return resp, nil
 }
 
 func main() {
-	stage := sparta.NewStage("prod")
-	apiGateway := sparta.NewAPIGateway("lambhackAPI", stage)
-	apiGateway.CORSEnabled = true
-
-	//lambda info
-	os.Setenv("AWS_PROFILE", "sparta")
-	os.Setenv("AWS_REGION", "us-east-1")
-
-	stackName := "LambhackApplication"
-	sparta.Main(stackName,
-		"Lambhack Application",
-		spartaLambdaData(apiGateway),
-		apiGateway,
-		nil)
-
+	lambda.Start(Handler)
 }
