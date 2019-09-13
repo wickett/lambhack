@@ -26,12 +26,10 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (Respon
 	}
 
 	resp := Response{
-		StatusCode:      200,
-		IsBase64Encoded: false,
-		Body:            output,
+		StatusCode: 200,
+		Body:       output,
 		Headers: map[string]string{
-			"Content-Type":           "application/text",
-			"X-MyCompany-Func-Reply": "hello-handler",
+			"Content-Type": "application/text",
 		},
 	}
 
