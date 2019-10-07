@@ -1,8 +1,11 @@
-provision:
-	go run main.go provision -s lambhack
+.PHONY: build clean deploy
 
-update:
-	go run main.go provision -s lambhack -c
+build:
+	dep ensure -v
+	env GOOS=linux go build -ldflags="-s -w" -o bin/hello hello/main.go
 
-test:
-	@go test ./...
+clean:
+	rm -rf ./bin ./vendor Gopkg.lock
+
+deploy: clean build
+	sls deploy --verbose
